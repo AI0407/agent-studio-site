@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent 工作室 · 一个人 + 一堆 AI 的游戏工作室</title>
+<meta name="description" content="Agent 工作室是 Agent 一个人的游戏工作室：没有团队、没有融资，只有脑洞和一堆好用的 AI 工具。代表作《字斗》《开局一块烂木筏》。">
+<meta name="theme-color" content="#0A0B0D">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Agent 工作室 · 一个人 + 一堆 AI 的游戏工作室">
+<meta property="og:description" content="我负责天马行空，AI 负责搬砖。目前两款已上线，第三款正在打磨。">
+<!-- TODO 域名确定后启用这三行：把 YOUR-DOMAIN 换成正式域名（不要带斜杠后缀），
+     在此之前保持注释，避免搜索引擎把页面归到别人的域名下。
+<meta property="og:url" content="https://YOUR-DOMAIN/">
+<meta property="og:image" content="https://YOUR-DOMAIN/assets/zidou.jpg">
+<link rel="canonical" href="https://YOUR-DOMAIN/">
+-->
+
+<link rel="icon" href="assets/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+
+<style>
+/* ============================================================
+   Agent 工作室 · Design Tokens
+   ============================================================ */
+:root{
+  /* 基底 */
+  --bg:#0A0B0D;
+  --surface:#14171D;
+  --line:rgba(255,255,255,.09);
+  --line-strong:rgba(255,255,255,.18);
+
+  /* 文字 */
+  --ink:#EDE8E0;
+  --ink-2:#A9A39A;
+  --ink-3:#7A7570;
+
+  /* 品牌色（取自 Logo） */
+  --brand:#7645AE;          /* 紫，仅用于填充与大面积 */
+  --brand-deep:#5E348C;     /* 渐变暗端 */
+  --brand-soft:#A87BD9;     /* 小字号文字（6.0:1 ✅ AA） */
+  --brand-lift:#C9A6EE;     /* 悬停 / 焦点环 */
+  --brand-ink:#1E2530;      /* Logo 中的墨蓝黑 */
+
+  /* 游戏章节强调色 */
+  --seal:#C03A2E;
+  --seal-soft:#E4675A;
+  --sea:#35C6E8;
+  --sea-soft:#7FE0F3;
+
+  /* 语义 */
+  --ok:#3FB950;
+
+  /* 字族 */
+  --font-serif:"Noto Serif SC","Source Han Serif SC","Songti SC",Georgia,serif;
+  --font-sans:"Inter","PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+
+  /* 尺寸 */
+  --wrap:1160px;
+  --r-sm:8px;
+  --r-md:18px;
+  --r-lg:24px;
+
+  /* 动效 */
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-sans);
+  font-size:16px;
+  line-height:1.7;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+img{max-width:100%;height:auto;display:block}
+picture{display:contents}
+h1,h2,h3,p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+a{color:inherit}
+
+:where(a,button):focus-visible{
+  outline:2px solid var(--brand-lift);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+/* skip link */
+.skip{
+  position:absolute;left:16px;top:-64px;z-index:100;
+  padding:12px 20px;border-radius:0 0 12px 12px;
+  background:var(--ink);color:#0A0B0D;font-weight:700;font-size:14px;
+  text-decoration:none;transition:top .2s var(--ease);
+}
+.skip:focus{top:0}
+
+.wrap{
+  width:100%;max-width:var(--wrap);
+  margin-inline:auto;
+  padding-inline:20px;
+}
+@media (min-width:768px){.wrap{padding-inline:32px}}
+
+/* ============================================================
+   通用：按钮 / 眉题 / 区块头
+   ============================================================ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:0 26px;
+  border:1px solid transparent;border-radius:999px;
+  font-family:var(--font-sans);font-size:15px;font-weight:600;line-height:1;
+  text-decoration:none;white-space:nowrap;cursor:pointer;
+  transition:transform .2s var(--ease),background .2s,border-color .2s,color .2s,box-shadow .2s;
+}
+.btn:hover{transform:scale(1.02)}
+.btn:active{transform:scale(.97)}
+.btn--sm{min-height:40px;padding:0 18px;font-size:14px}
+
+.btn--primary{
+  background:linear-gradient(180deg,#8A55C4,var(--brand-deep));
+  color:#fff;
+  box-shadow:0 14px 34px -16px rgba(118,69,174,.95);
+}
+.btn--primary:hover{box-shadow:0 18px 42px -16px rgba(138,85,196,1)}
+
+.btn--ghost{
+  border-color:var(--line-strong);
+  color:var(--ink);
+  background:rgba(255,255,255,.03);
+}
+.btn--ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3)}
+
+.btn--line{
+  border-color:var(--line-strong);color:var(--ink);
+  background:transparent;min-height:44px;padding:0 20px;font-size:14px;
+}
+.btn--line:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
+
+.eyebrow{
+  display:flex;align-items:center;gap:10px;
+  font-size:12px;font-weight:600;line-height:1.4;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-2);
+  margin-bottom:18px;
+}
+.eyebrow::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--brand-soft);flex:none;
+}
+
+.section-head{max-width:660px;margin-bottom:48px}
+.section-head h2{
+  font-family:var(--font-serif);
+  font-size:clamp(24px,4.2vw,38px);
+  line-height:1.25;
+  font-weight:600;
+  letter-spacing:-.01em;
+}
+.section-head h2 em{font-style:normal;color:var(--brand-soft)}
+.section-head p{
+  margin-top:16px;color:var(--ink-2);font-size:17px;max-width:52ch;
+}
+@media (min-width:768px){.section-head{margin-bottom:64px}}
+
+/* ============================================================
+   导航
+   ============================================================ */
+.nav{
+  position:sticky;top:0;z-index:60;
+  border-bottom:1px solid transparent;
+  transition:background .3s var(--ease),border-color .3s var(--ease),backdrop-filter .3s;
+}
+.nav.is-scrolled{
+  background:rgba(10,11,13,.74);
+  -webkit-backdrop-filter:blur(14px) saturate(150%);
+  backdrop-filter:blur(14px) saturate(150%);
+  border-bottom-color:var(--line);
+}
+.nav__inner{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  height:68px;max-width:var(--wrap);margin-inline:auto;padding-inline:20px;
+}
+@media (min-width:768px){.nav__inner{padding-inline:32px;height:76px}}
+
+.brand{
+  display:inline-flex;align-items:center;gap:10px;
+  text-decoration:none;font-weight:700;font-size:16px;letter-spacing:.01em;
+}
+.brand__mark{
+  width:36px;height:36px;flex:none;
+  object-fit:contain;
+  filter:drop-shadow(0 6px 16px rgba(118,69,174,.55));
+  transition:transform .25s var(--ease);
+}
+.brand:hover .brand__mark{transform:rotate(-4deg) scale(1.04)}
+.brand__text em{
+  font-style:normal;color:var(--ink-2);font-weight:500;
+  margin-left:2px;font-size:14px;
+}
+
+.nav__toggle{
+  display:inline-grid;place-content:center;gap:5px;
+  width:44px;height:44px;padding:0;
+  background:transparent;border:1px solid var(--line);border-radius:12px;
+  cursor:pointer;
+}
+.nav__toggle span{
+  display:block;width:18px;height:1.5px;background:var(--ink);
+  transition:transform .25s var(--ease),opacity .2s;
+}
+.nav.is-open .nav__toggle span:first-child{transform:translateY(3.25px) rotate(45deg)}
+.nav.is-open .nav__toggle span:last-child{transform:translateY(-3.25px) rotate(-45deg)}
+
+.nav__menu{
+  position:absolute;left:0;right:0;top:100%;
+  display:none;flex-direction:column;gap:2px;
+  padding:8px 20px 20px;
+  background:rgba(10,11,13,.98);
+  border-bottom:1px solid var(--line);
+}
+.nav.is-open .nav__menu{display:flex}
+.nav__menu a{
+  display:flex;align-items:center;min-height:48px;
+  padding:0 4px;font-size:15px;text-decoration:none;color:var(--ink-2);
+  border-bottom:1px solid var(--line);
+  transition:color .2s;
+}
+.nav__menu a:hover{color:var(--ink)}
+.nav__menu .btn{margin-top:12px;border-bottom:0;color:var(--ink)}
+
+@media (min-width:768px){
+  .nav__toggle{display:none}
+  .nav__menu{
+    position:static;display:flex;flex-direction:row;align-items:center;
+    gap:6px;padding:0;background:none;border:0;
+  }
+  .nav__menu a{
+    min-height:40px;padding:0 14px;border-bottom:0;border-radius:999px;
+    font-size:14px;
+  }
+  .nav__menu a:hover{background:rgba(255,255,255,.05);color:var(--ink)}
+  .nav__menu .btn{margin-top:0;margin-left:8px;padding:0 18px}
+}
+
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero{position:relative;padding:40px 0 64px;overflow:hidden}
+@media (min-width:992px){.hero{padding:72px 0 88px}}
+
+.hero__glow{position:absolute;border-radius:50%;pointer-events:none;z-index:0}
+.hero__glow--seal{
+  width:min(70vw,520px);aspect-ratio:1;
+  top:-8%;left:-14%;
+  background:radial-gradient(circle,rgba(118,69,174,.34),transparent 66%);
+}
+.hero__glow--sea{
+  width:min(80vw,580px);aspect-ratio:1;
+  bottom:-16%;right:-18%;
+  background:radial-gradient(circle,rgba(53,198,232,.22),transparent 66%);
+}
+
+.hero__inner{
+  position:relative;z-index:1;
+  display:grid;gap:40px;
+  align-items:center;
+}
+@media (min-width:992px){
+  .hero__inner{grid-template-columns:1.04fr .96fr;gap:56px}
+}
+
+.hero h1{
+  font-family:var(--font-serif);
+  font-size:clamp(34px,7vw,60px);
+  line-height:1.12;
+  font-weight:600;
+  letter-spacing:-.015em;
+  margin-bottom:20px;
+}
+.hero h1 em{font-style:normal;color:var(--brand-soft)}
+
+.hero .lede{
+  color:var(--ink-2);
+  font-size:clamp(15px,1.6vw,17px);
+  line-height:1.75;
+  max-width:36ch;
+}
+
+.hero__cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+@media (max-width:400px){.hero__cta .btn{width:100%}}
+
+/* 双封面 */
+.hero__visual{
+  position:relative;
+  width:100%;
+  max-width:462px;
+  aspect-ratio:1/.92;
+  margin-inline:auto;
+}
+.cover{
+  position:absolute;margin:0;
+  border-radius:20%;overflow:hidden;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 30px 70px -26px rgba(0,0,0,.95),0 0 0 1px rgba(0,0,0,.4);
+  transition:transform .45s var(--ease),box-shadow .45s var(--ease);
+}
+.cover img{width:100%;height:100%;object-fit:cover}
+.cover--a{
+  width:56%;top:0;left:0;
+  transform:rotate(-7deg);
+  box-shadow:0 30px 70px -26px rgba(0,0,0,.95),0 24px 80px -30px rgba(192,58,46,.85);
+}
+.cover--b{
+  width:52%;right:0;bottom:1%;
+  transform:rotate(5deg);
+  box-shadow:0 30px 70px -26px rgba(0,0,0,.95),0 24px 80px -30px rgba(53,198,232,.75);
+}
+@media (min-width:768px){
+  .cover--b{right:-4%;bottom:-3%}
+}
+@media (hover:hover) and (pointer:fine){
+  .cover--a:hover{transform:rotate(-4deg) translateY(-6px)}
+  .cover--b:hover{transform:rotate(2deg) translateY(-6px)}
+}
+
+.scrollhint{
+  position:relative;z-index:1;
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:40px;
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-2);text-decoration:none;
+}
+.scrollhint i{
+  display:block;width:1px;height:26px;
+  background:linear-gradient(to bottom,var(--ink-3),transparent);
+  animation:drop 2.4s var(--ease) infinite;
+}
+@keyframes drop{
+  0%,100%{opacity:.25;transform:scaleY(.6);transform-origin:top}
+  45%{opacity:1;transform:scaleY(1);transform-origin:top}
+}
+@media (prefers-reduced-motion:reduce){.scrollhint i{animation:none}}
+@media (min-width:992px){.scrollhint{display:none}}
+
+/* ============================================================
+   作品区
+   ============================================================ */
+.works{padding:48px 0 24px;position:relative}
+@media (min-width:992px){.works{padding:72px 0 40px}}
+
+.game{
+  position:relative;
+  display:grid;gap:28px;
+  padding:20px;
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  background:linear-gradient(165deg,rgba(255,255,255,.04),rgba(255,255,255,.012));
+  overflow:hidden;
+  isolation:isolate;
+}
+.game::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(110% 80% at 0% 0%,var(--accent-glow),transparent 62%);
+}
+.game--seal{
+  --accent:var(--seal);--accent-soft:var(--seal-soft);--accent-glow:rgba(192,58,46,.20);
+}
+.game--sea{
+  --accent:#35C6E8;--accent-soft:#7FE0F3;--accent-glow:rgba(53,198,232,.16);
+}
+.game + .game{margin-top:24px}
+@media (min-width:992px){.game + .game{margin-top:32px}}
+
+@media (min-width:768px){
+  .game{
+    grid-template-columns:5fr 7fr;
+    gap:40px;align-items:stretch;
+    padding:28px;
+  }
+  .game--flip .game__stage-wrap{order:2}
+  .game__stage-wrap{align-self:center}
+}
+@media (min-width:992px){
+  .game{grid-template-columns:1fr 1fr;gap:52px;padding:32px}
+}
+/* 平板：两列并列时让舞台接近正方形，避免左侧留白过多 */
+@media (min-width:768px) and (max-width:991px){
+  .game__stage{aspect-ratio:1/1}
+}
+
+/* 舞台 */
+.game__stage-wrap{position:relative}
+.game__stage{
+  position:relative;
+  display:grid;place-items:center;
+  aspect-ratio:4/3;
+  border-radius:var(--r-md);
+  border:1px solid var(--line);
+  background:
+    radial-gradient(circle at 50% 44%,var(--accent-glow),transparent 62%),
+    rgba(0,0,0,.34);
+  overflow:hidden;
+}
+.game__stage::before{
+  content:"";position:absolute;
+  width:66%;aspect-ratio:1;border-radius:50%;
+  border:1px solid rgba(255,255,255,.06);
+}
+.game__stage::after{
+  content:attr(data-mark);
+  position:absolute;
+  right:-10px;bottom:-44px;
+  font-family:var(--font-serif);
+  font-size:140px;line-height:1;
+  color:rgba(255,255,255,.05);
+  pointer-events:none;user-select:none;
+}
+@media (min-width:992px){
+  .game__stage::after{font-size:170px;right:-14px;bottom:-56px}
+}
+.game__stage img{
+  position:relative;
+  width:min(252px,62%);
+  border-radius:22%;
+  box-shadow:0 26px 70px -22px rgba(0,0,0,.95);
+  transition:transform .45s var(--ease);
+}
+@media (hover:hover) and (pointer:fine){
+  .game:hover .game__stage img{transform:translateY(-5px) scale(1.03)}
+}
+
+/* 指针跟随光斑 */
+.game__spot{
+  position:absolute;z-index:0;
+  width:360px;height:360px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.075),transparent 64%);
+  transform:translate(-50%,-50%);
+  opacity:0;pointer-events:none;
+  transition:opacity .35s var(--ease);
+}
+@media (hover:hover) and (pointer:fine){
+  .game:hover .game__spot{opacity:1}
+}
+
+/* 正文 */
+.game__body{position:relative;z-index:1}
+.game__idx{
+  display:block;
+  font-family:var(--font-serif);
+  font-size:13px;font-weight:600;letter-spacing:.16em;
+  color:var(--accent-soft);
+}
+.game__title{
+  font-family:var(--font-serif);
+  font-size:clamp(24px,3.8vw,32px);
+  line-height:1.3;font-weight:600;
+  margin:10px 0 8px;
+}
+.game--sea .game__title{
+  font-family:var(--font-sans);
+  font-weight:800;letter-spacing:-.015em;
+}
+.game__tagline{
+  color:var(--accent-soft);
+  font-size:15px;font-weight:600;
+  margin-bottom:16px;
+}
+.game__rule{
+  display:block;width:44px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,var(--accent),transparent);
+  margin-bottom:18px;
+}
+.game__desc{
+  color:var(--ink-2);
+  font-size:15px;line-height:1.8;
+  max-width:46ch;
+}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.tags li{
+  padding:5px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-size:13px;color:var(--ink-2);
+  background:rgba(255,255,255,.02);
+}
+.game__foot{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:14px;margin-top:28px;padding-top:20px;
+  border-top:1px solid var(--line);
+}
+@media (min-width:768px){
+  .game__body{display:flex;flex-direction:column}
+  .game__foot{margin-top:auto}
+}
+.status{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--ink-2);
+}
+.status i{
+  width:7px;height:7px;border-radius:50%;flex:none;
+  background:var(--ok);
+  box-shadow:0 0 0 3px rgba(63,185,80,.16);
+}
+
+/* 敬请期待 */
+.soon{
+  position:relative;
+  margin-top:24px;padding:40px 24px;
+  border:1px dashed rgba(255,255,255,.16);
+  border-radius:var(--r-lg);
+  text-align:center;
+  background:linear-gradient(180deg,rgba(255,255,255,.018),transparent);
+}
+@media (min-width:768px){.soon{padding:56px 40px}.soon{margin-top:32px}}
+.soon__num{
+  font-family:var(--font-serif);font-size:13px;letter-spacing:.16em;
+  color:var(--ink-2);
+}
+.soon h3{
+  font-family:var(--font-serif);
+  font-size:clamp(20px,3vw,26px);font-weight:600;
+  margin:10px 0 12px;
+}
+.soon p{
+  color:var(--ink-2);font-size:15px;
+  max-width:44ch;margin:0 auto 26px;
+}
+
+/* ============================================================
+   关于
+   ============================================================ */
+.about{padding:64px 0;position:relative}
+@media (min-width:992px){.about{padding:104px 0}}
+.about__head{margin-bottom:40px}
+
+.about__grid{display:grid;gap:32px}
+@media (min-width:992px){
+  .about__grid{grid-template-columns:296px 1fr;gap:56px;align-items:start}
+}
+
+/* 工作室档案卡 */
+.idcard{
+  padding:28px 24px 24px;
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  background:
+    radial-gradient(120% 90% at 50% 0%,rgba(118,69,174,.22),transparent 62%),
+    rgba(255,255,255,.018);
+  text-align:center;
+}
+.idcard img{
+  width:104px;height:104px;
+  margin:0 auto 16px;
+  filter:drop-shadow(0 20px 34px rgba(118,69,174,.55));
+}
+.idcard h3{
+  font-family:var(--font-serif);
+  font-size:22px;font-weight:600;line-height:1.3;
+}
+.idcard__role{
+  margin-top:6px;
+  font-size:13px;color:var(--ink-2);
+}
+.idcard__meta{
+  margin:22px 0 0;padding-top:20px;
+  border-top:1px solid var(--line);
+  display:grid;gap:10px;
+  font-size:13px;
+}
+.idcard__meta > div{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.idcard__meta dt{color:var(--ink-2)}
+.idcard__meta dd{margin:0;font-weight:600;color:var(--ink)}
+
+/* 理念列表 */
+.principles{display:grid;gap:0}
+.principles li{
+  display:grid;grid-template-columns:auto 1fr;gap:16px;
+  padding:22px 0;
+  border-top:1px solid var(--line);
+}
+.principles li:last-child{border-bottom:1px solid var(--line)}
+.principles__n{
+  font-family:var(--font-serif);
+  font-size:12px;font-weight:600;letter-spacing:.16em;
+  color:var(--brand-soft);
+  padding-top:6px;
+}
+.principles h3{
+  font-family:var(--font-serif);
+  font-size:18px;font-weight:600;line-height:1.45;
+  margin-bottom:8px;
+}
+.principles p{color:var(--ink-2);font-size:14.5px;line-height:1.8}
+
+/* ============================================================
+   联系
+   ============================================================ */
+.contact{padding:8px 0 64px}
+@media (min-width:992px){.contact{padding:8px 0 104px}}
+.contact__card{
+  position:relative;
+  padding:36px 24px;
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  background:
+    radial-gradient(120% 120% at 100% 0%,rgba(53,198,232,.12),transparent 58%),
+    radial-gradient(100% 120% at 0% 100%,rgba(118,69,174,.18),transparent 58%),
+    rgba(255,255,255,.018);
+  overflow:hidden;
+}
+@media (min-width:768px){.contact__card{padding:52px 44px}}
+.contact__card h2{
+  font-family:var(--font-serif);
+  font-size:clamp(24px,4vw,34px);font-weight:600;line-height:1.3;
+  margin-bottom:10px;
+}
+.contact__card > p{color:var(--ink-2);font-size:16px;max-width:44ch}
+.contact__links{
+  display:grid;gap:12px;margin-top:32px;
+}
+@media (min-width:768px){.contact__links{grid-template-columns:repeat(3,1fr);gap:16px}}
+.link-card{
+  display:flex;flex-direction:column;gap:6px;
+  padding:20px;min-height:88px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(0,0,0,.25);
+  text-decoration:none;
+  transition:border-color .25s,background .25s,transform .25s var(--ease);
+}
+.link-card:hover{border-color:var(--line-strong);background:rgba(255,255,255,.05);transform:translateY(-3px)}
+.link-card strong{font-size:15px;font-weight:600}
+.link-card span{font-size:13px;color:var(--ink-2);word-break:break-all}
+
+/* ============================================================
+   页脚
+   ============================================================ */
+.footer{
+  border-top:1px solid var(--line);
+  padding:32px 0 40px;
+}
+.footer__inner{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:16px;
+  font-size:13px;color:var(--ink-2);
+}
+.footer__inner nav{display:flex;gap:20px;flex-wrap:wrap}
+.footer a{text-decoration:none;color:var(--ink-2);transition:color .2s}
+.footer a:hover{color:var(--ink)}
+.totop{
+  display:inline-flex;align-items:center;gap:6px;
+  min-height:44px;
+}
+
+/* ============================================================
+   进入视口动画（仅 JS 可用时启用，避免禁用 JS 后空白）
+   ============================================================ */
+.js .reveal{
+  opacity:0;transform:translateY(18px);
+  transition:opacity .6s var(--ease),transform .6s var(--ease);
+}
+.js .reveal.is-in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .js .reveal{opacity:1;transform:none;transition:none}
+}
+</style>
+</head>
+
+<body>
+<a class="skip" href="#main">跳到主要内容</a>
+
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="brand" href="#top" aria-label="Agent 工作室，返回顶部">
+      <img class="brand__mark" src="assets/logo-dark.png" alt="" width="36" height="36" aria-hidden="true">
+      <span class="brand__text">Agent<em>工作室</em></span>
+    </a>
+
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="打开菜单">
+      <span></span><span></span>
+    </button>
+
+    <nav class="nav__menu" id="menu" aria-label="主导航">
+      <a href="#works">作品</a>
+      <a href="#about">关于</a>
+      <a href="#contact">联系</a>
+      <a class="btn btn--ghost btn--sm" href="https://www.taptap.cn/developer/441298" target="_blank" rel="noopener noreferrer">
+        TaTap 主页 <span aria-hidden="true">↗</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- 01 · 首屏 -->
+  <section class="hero" id="top">
+    <div class="hero__glow hero__glow--seal" aria-hidden="true"></div>
+    <div class="hero__glow hero__glow--sea" aria-hidden="true"></div>
+
+    <div class="wrap hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow">Agent · 一个人的游戏工作室</p>
+        <h1>一个人，<br>能用 AI 做出<br><em>多少款游戏</em>？</h1>
+        <p class="lede">
+          我是 Agent 工作室的“唯一员工”。没有庞大的团队，没有巨额的融资，
+          只有无尽的脑洞和一堆极其好用的 AI 工具——我负责天马行空，AI 负责帮我搬砖。
+          目前两款已上线，第三款在打磨。
+        </p>
+        <div class="hero__cta">
+          <a class="btn btn--primary" href="#works">看看两款游戏</a>
+          <a class="btn btn--ghost" href="https://www.taptap.cn/developer/441298" target="_blank" rel="noopener noreferrer">
+            在 TaTap 关注我们
+          </a>
+        </div>
+      </div>
+
+      <div class="hero__visual">
+        <figure class="cover cover--a">
+          <picture>
+            <source srcset="assets/zidou.webp" type="image/webp">
+            <img src="assets/zidou.jpg" alt="《字斗》封面：宣纸底色上的朱红毛笔字“字斗”，背景有淡墨远山与一笔飞白墨迹" width="640" height="640">
+          </picture>
+        </figure>
+        <figure class="cover cover--b">
+          <picture>
+            <source srcset="assets/raft.webp" type="image/webp">
+            <img src="assets/raft.jpg" alt="《开局一块烂木筏》封面：低多边形海上木筏、站在木板上的小人，以及水下的卡通鲨鱼" width="640" height="640">
+          </picture>
+        </figure>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <a class="scrollhint" href="#works">
+        <i aria-hidden="true"></i> 向下
+      </a>
+    </div>
+  </section>
+
+  <!-- 02 · 作品 -->
+  <section class="works" id="works">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Works · 作品</p>
+        <h2>两块拼图，<em>两种上头</em></h2>
+        <p>一款在宣纸上拆字，一款在海上补木板。都很小，都很难停手。</p>
+      </div>
+
+      <!-- 游戏 01 -->
+      <article class="game game--seal reveal">
+        <div class="game__stage-wrap">
+          <div class="game__stage" data-mark="字">
+            <picture>
+              <source srcset="assets/zidou.webp" type="image/webp">
+              <img src="assets/zidou.jpg"
+                   alt="《字斗》游戏封面"
+                   width="640" height="640" loading="lazy" decoding="async">
+            </picture>
+          </div>
+        </div>
+        <div class="game__body">
+          <span class="game__idx">01 / WORKS</span>
+          <h3 class="game__title">字斗</h3>
+          <p class="game__tagline">一字一句，见招拆招</p>
+          <span class="game__rule" aria-hidden="true"></span>
+          <p class="game__desc">
+            以汉字为棋子的对战玩法。拆字、组词、抢势，在宣纸上用笔画互相拆台。
+            一局三五分钟，输赢常常卡在最后一个字——这也是它最让人不服气的地方。
+          </p>
+          <ul class="tags">
+            <li>汉字对战</li>
+            <li>策略</li>
+            <li>竖屏单手</li>
+          </ul>
+          <div class="game__foot">
+            <span class="status"><i aria-hidden="true"></i>已上线</span>
+            <a class="btn btn--line" href="https://www.taptap.cn/app/1001925?os=android" target="_blank" rel="noopener noreferrer">
+              在 TaTap 打开 <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 游戏 02 -->
+      <article class="game game--sea game--flip reveal">
+        <div class="game__stage-wrap">
+          <div class="game__stage" data-mark="筏">
+            <picture>
+              <source srcset="assets/raft.webp" type="image/webp">
+              <img src="assets/raft.jpg"
+                   alt="《开局一块烂木筏》游戏封面"
+                   width="640" height="640" loading="lazy" decoding="async">
+            </picture>
+          </div>
+        </div>
+        <div class="game__body">
+          <span class="game__idx">02 / WORKS</span>
+          <h3 class="game__title">开局一块烂木筏</h3>
+          <p class="game__tagline">从一块木板开始，把海变成家</p>
+          <span class="game__rule" aria-hidden="true"></span>
+          <p class="game__desc">
+            低多边形海上生存。捞漂浮物、补木板、躲鲨鱼，一块烂木筏慢慢长成海上据点。
+            规则简单到不用教程，但鲨鱼从来不讲道理。
+          </p>
+          <ul class="tags">
+            <li>海上生存</li>
+            <li>建造</li>
+            <li>轻松上手</li>
+          </ul>
+          <div class="game__foot">
+            <span class="status"><i aria-hidden="true"></i>已上线</span>
+            <a class="btn btn--line" href="https://www.taptap.cn/app/1006287?os=pc" target="_blank" rel="noopener noreferrer">
+              在 TaTap 打开 <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+        <div class="game__spot" aria-hidden="true"></div>
+      </article>
+
+      <!-- 敬请期待 -->
+      <div class="soon reveal">
+        <span class="soon__num">03 / COMING</span>
+        <h3>第三块拼图</h3>
+        <p>下一款还在打磨：规则已经能一句话讲清了，剩下的时间都花在“让它好玩”上。</p>
+        <a class="btn btn--ghost" href="https://www.taptap.cn/developer/441298" target="_blank" rel="noopener noreferrer">
+          上线第一时间通知我
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 · 关于 -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <div class="section-head reveal about__head">
+        <p class="eyebrow">About · 关于</p>
+        <h2>一个人，<em>一堆 AI</em></h2>
+        <p>
+          Agent 工作室只有一个员工。不扩编、不融资，把规模换成了速度——
+          所以能一款接一款地试，试错了也不心疼。
+        </p>
+      </div>
+
+      <div class="about__grid">
+        <aside class="idcard reveal" aria-label="工作室档案">
+          <img src="assets/logo-dark.png" alt="" width="104" height="104" loading="lazy" decoding="async">
+          <h3>Agent</h3>
+          <p class="idcard__role">唯一员工 · 创始人 · 搬砖指挥</p>
+          <dl class="idcard__meta">
+            <div><dt>在职人数</dt><dd>1 人</dd></div>
+            <div><dt>合作对象</dt><dd>若干 AI</dd></div>
+            <div><dt>当前状态</dt><dd>持续搬砖中</dd></div>
+          </dl>
+        </aside>
+
+        <ol class="principles">
+          <li class="reveal">
+            <span class="principles__n" aria-hidden="true">01</span>
+            <div>
+              <h3>创意归我，搬砖归 AI</h3>
+              <p>我负责天马行空，AI 负责把想法变成能跑的东西。没有排期会，也没有跨部门对齐。</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="principles__n" aria-hidden="true">02</span>
+            <div>
+              <h3>规则先能一句话讲清</h3>
+              <p>讲不清就不做。玩家进游戏的第一分钟，就该知道自己要干什么、为什么还想再来一把。</p>
+            </div>
+          </li>
+          <li class="reveal">
+            <span class="principles__n" aria-hidden="true">03</span>
+            <div>
+              <h3>手感必须自己调</h3>
+              <p>点下去爽不爽，AI 判断不了。这一关只能自己一遍遍玩、一版版改，没有捷径。</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · 联系 -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="contact__card reveal">
+        <p class="eyebrow">Contact · 联系</p>
+        <h2>想聊聊，或者只是来催更</h2>
+        <p>玩法建议、bug 反馈、媒体与合作，都可以直接找我们。</p>
+
+        <div class="contact__links">
+          <a class="link-card" href="https://www.taptap.cn/developer/441298" target="_blank" rel="noopener noreferrer">
+            <strong>TaTap 厂商主页 <span aria-hidden="true">↗</span></strong>
+            <span>关注新品、更新与社区动态</span>
+          </a>
+          <a class="link-card" href="mailto:auron123456@2925.com">
+            <strong>玩家反馈邮箱 <span aria-hidden="true">↗</span></strong>
+            <span>auron123456@2925.com</span>
+          </a>
+          <a class="link-card" href="mailto:auron123456@2925.com?subject=商务合作">
+            <strong>商务与媒体 <span aria-hidden="true">↗</span></strong>
+            <span>发行、联运、采访请联系这里</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <p>© 2026 Agent 工作室</p>
+    <nav aria-label="页脚导航">
+      <a href="#works">作品</a>
+      <a href="#about">关于</a>
+      <a href="#contact">联系</a>
+      <!-- 绑定自有域名并通过备案后，在此补备案号 -->
+      <a class="totop" href="#top">回到顶部 <span aria-hidden="true">↑</span></a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+
+/* ---------- 导航：滚动加底 ---------- */
+(function () {
+  var nav = document.getElementById('nav');
+  var onScroll = function () {
+    nav.classList.toggle('is-scrolled', window.scrollY > 24);
+  };
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+
+/* ---------- 导航：移动端抽屉 ---------- */
+(function () {
+  var nav = document.getElementById('nav');
+  var toggle = nav.querySelector('.nav__toggle');
+  if (!toggle) return;
+
+  var setOpen = function (open) {
+    nav.classList.toggle('is-open', open);
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+  };
+
+  toggle.addEventListener('click', function () {
+    setOpen(!nav.classList.contains('is-open'));
+  });
+
+  nav.querySelectorAll('#menu a').forEach(function (a) {
+    a.addEventListener('click', function () { setOpen(false); });
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!nav.contains(e.target)) setOpen(false);
+  });
+})();
+
+/* ---------- 进入视口渐显 ---------- */
+(function () {
+  var items = document.querySelectorAll('.reveal');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce || !('IntersectionObserver' in window)) {
+    items.forEach(function (el) { el.classList.add('is-in'); });
+    return;
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      var delay = Number(el.dataset.delay || 0);
+      setTimeout(function () { el.classList.add('is-in'); }, delay);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+  items.forEach(function (el) { io.observe(el); });
+})();
+
+/* ---------- 作品卡：指针跟随光斑（仅精确指针设备） ---------- */
+(function () {
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!fine || reduce) return;
+
+  document.querySelectorAll('.game').forEach(function (card) {
+    var spot = card.querySelector('.game__spot');
+    if (!spot) {
+      spot = document.createElement('div');
+      spot.className = 'game__spot';
+      spot.setAttribute('aria-hidden', 'true');
+      card.appendChild(spot);
+    }
+    var raf = 0;
+    card.addEventListener('pointermove', function (e) {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        var r = card.getBoundingClientRect();
+        spot.style.left = (e.clientX - r.left) + 'px';
+        spot.style.top = (e.clientY - r.top) + 'px';
+        raf = 0;
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

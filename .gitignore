@@ -1,0 +1,16 @@
+# 本地工具与对话记忆，不发布到公开仓库
+.workbuddy/
+
+# 系统与编辑器噪音
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+.vscode/
+.idea/
+
+# 发布包（由部署脚本生成，不入库）
+dist/
+
+# 应用发布标记文件（本地工具用）
+.wbapp_*.genie
